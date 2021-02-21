@@ -47,43 +47,32 @@ public class DocTransferDemo {
         if (!errorPath.exists()) {
             errorPath.mkdirs();
         }
-        try (OutputStream errOs = new FileOutputStream(new File(LOG_PATH + "\\error.log"))) {
-            File[] files = file.listFiles();
-            for (File f : files) {
-                String path = f.getAbsolutePath();
-                String name = f.getName();
-                System.out.println(name);
-                String s;
+        File[] files = file.listFiles();
+        for (File f : files) {
+            String path = f.getAbsolutePath();
+            String name = f.getName();
+            System.out.println(name);
+            String s;
+            try {
+                s = deal2007(path);
+            } catch (Exception e) {
                 try {
-                    s = deal2007(path);
-                } catch (Exception e) {
-                    write(errOs, e);
-                    try {
-                        s = deal2003(path);
-                    } catch (Exception exception) {
-                        write(errOs, exception);
-                        continue;
-                    }
-                }
-                int endIndex = name.lastIndexOf('.');
-                String newName = name.substring(0, endIndex) + ".csv";
-                try (OutputStream fos = new FileOutputStream(new File(OUTPUT_PATH + "\\" + newName))) {
-                    fos.write(s.getBytes());
-                    fos.flush();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    s = deal2003(path);
+                } catch (Exception exception) {
+                    continue;
                 }
             }
-            errOs.flush();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            int endIndex = name.lastIndexOf('.');
+            String newName = name.substring(0, endIndex) + ".csv";
+            try (OutputStream fos = new FileOutputStream(new File(OUTPUT_PATH + "\\" + newName))) {
+                fos.write(s.getBytes());
+                fos.flush();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-
-
     }
 
     public static String deal2003(String path) throws Exception {
